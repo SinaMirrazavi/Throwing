@@ -1,0 +1,20 @@
+<Config>
+<Packages> fastthrowing kuka_robot_model</Packages>
+	<World> Examples/BasicWorld </World>
+	<Robot> KUKA
+		<Name> fastthrowing module </Name>
+		<RobotModule> FastThrowing
+			<Options> </Options>
+		</RobotModule> 
+        <ControlMode>   position    </ControlMode>
+        <Args>                    </Args>
+    </Robot>
+
+    <Simulator>
+
+        <Period>  0.002  </Period>
+        <Gravity> 0 0 -9.81 </Gravity>
+	</Simulator>
+</Config>
+
+
