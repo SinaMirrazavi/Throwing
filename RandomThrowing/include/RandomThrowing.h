@@ -21,14 +21,14 @@
 #include "std_msgs/Int16.h"
 #include "geometry_msgs/PoseStamped.h"
 
-#include "RobotLib/RobotInterface.h"
-#include "MathLib/MathLib.h"
-#include "MathLib/IKGroupSolver.h"
+#include "RobotInterface.h"
+#include "MathLib.h"
+#include "IKGroupSolver.h"
 
-#include "RobotLib/ForwardDynamics.h"
-#include "RobotLib/InverseDynamics.h"
-#include "RobotLib/KinematicChain.h"
-#include "RobotLib/PIDController.h"
+#include "ForwardDynamics.h"
+#include "InverseDynamics.h"
+#include "KinematicChain.h"
+#include "PIDController.h"
 
 #include "Gaussians.h"
 #include "CDDynamics.h"
@@ -43,8 +43,7 @@ enum ENUM_STANDBY{STANDBY_OFF, STANDBY_ON};
 enum ENUM_COMMAND{COMMAND_REST, COMMAND_JOB, COMMAND_HOME, COMMAND_THROWJOINT_READY, COMMAND_NONE};
 enum ENUM_HANDCOMMAND{HANDCOMMAND_GRASP, HANDCOMMAND_RELEASE, HANDCOMMAND_HOME, HANDCOMMAND_NONE};
 enum ENUM_STATUS{STATUS_IDLE_PRETHROW, STATUS_THROW_READY, STATUS_THROW_THROWING, STATUS_THROW_REST,
-	STATUS_THROWJOINT_READY, STATUS_THROWJOINT_THROWING, STATUS_THROWJOINT_REST,
-	STATUS_REST, STATUS_NONE};
+	STATUS_THROWJOINT_READY, STATUS_THROWJOINT_THROWING, STATUS_THROWJOINT_REST,STATUS_REST, STATUS_NONE};
 enum ENUM_PLANNER{PLANNER_CDDYN, PLANNER_POLY};
 
 #define WN_POSITION_FILTER 50

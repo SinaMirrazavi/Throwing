@@ -336,7 +336,6 @@ RobotInterface::Status FastThrowing::RobotUpdate(){
 			}
 			break;
 		case STATUS_THROWJOINT_THROWING:
-
 			if( lThrowingIndex < 500+TARGET_CONT_FRAME+1000-1 )
 			{
 				// 400 too early
@@ -441,7 +440,7 @@ RobotInterface::Status FastThrowing::RobotUpdateCore(){
 	double lEndPos[3];
 	if( (mStatus ==STATUS_THROWJOINT_THROWING) && (lstaticFrame == 0 ) )
 	{
-    	fid = fopen("/home/seungsu/ball.txt", "w+");
+    	fid = fopen("/home/sina/ball.txt", "w+");
     	lstaticFrame++;
 	}
 	else if(lstaticFrame > 0 )
@@ -489,6 +488,7 @@ int FastThrowing::RespondToConsoleCommand(const string cmd, const vector<string>
         mCommand = COMMAND_JOB;
     }
     else if(cmd=="throw"){
+    	cout<<"throw"<<endl;
     	mHandCommand = HANDCOMMAND_GRASP;
 
     	mJointThrow.Set(cThrow, KUKA_DOF);
@@ -502,15 +502,15 @@ int FastThrowing::RespondToConsoleCommand(const string cmd, const vector<string>
 
     	//mTracking.Update();
     	//mTracking.getRBodyPosition(lTargetPos.Array(), mTrackingObjName );
-    	lTargetPos(0) = -3.9;
+/*    	lTargetPos(0) = -3.9;
     	lTargetPos(1) =  0.0;
-    	lTargetPos(2) =  0.0;
+    	lTargetPos(2) =  0.0;*/
 
-    	/*
+
     	lTargetPos(0) = -3.4;
     	lTargetPos(1) = -0.957755;
     	lTargetPos(2) =  0.0;
-    	*/
+
 
 
     	if( lTargetPos.Norm() < 0.0001 )
@@ -713,12 +713,13 @@ cout<<"mOffsetMag "<<mOffsetMag<<endl;
 		mThrowingJointTrj.SetRow(lJoint, i+500+TARGET_CONT_FRAME);
 	}
 
-	mThrowingJointTrj.Save("/home/seungsu/trj.txt", 10, 500+TARGET_CONT_FRAME+1000);
+	mThrowingJointTrj.Save("/home/sina/trj.txt", 10, 500+TARGET_CONT_FRAME+1000);
 
 cout<<"END OF THE CODE"<<endl;
 }
 
 
+/*
 void FastThrowing::_calculateThrowJointTrajectory(void)
 {
 	Vector lJoint(KUKA_DOF), lJointIN(KUKA_DOF);
@@ -749,7 +750,7 @@ void FastThrowing::_calculateThrowJointTrajectory(void)
 		mSKinematicChain->getJacobianPos(mJacobianPos);
 		mSKinematicChain->getEndPos(lPos.Array());
 
-		/*
+
 		// Set maximum joint velocity
 		for(int i=0;i<KUKA_DOF;i++){
 			mJointVelLimitsDn(i) = -mSKinematicChain->getMaxVel(i);
@@ -762,7 +763,7 @@ void FastThrowing::_calculateThrowJointTrajectory(void)
 			}
 		}
 		mIKSolver.SetLimits(mJointVelLimitsDn,mJointVelLimitsUp);
-		*/
+
 
 		for(int i=0;i<KUKA_DOF;i++){
 			mJointVelLimitsDn(i) =  mSKinematicChain->getMin(i);
@@ -799,7 +800,7 @@ void FastThrowing::_calculateThrowJointTrajectory(void)
 		}
 		lJointsVel.Print();
 
-		/*
+
 		lJointsVel(0) = -mSKinematicChain->getMaxVel(0);
 		lJointsVel(1) = -mSKinematicChain->getMaxVel(1);
 		lJointsVel(2) = -mSKinematicChain->getMaxVel(2);
@@ -807,7 +808,7 @@ void FastThrowing::_calculateThrowJointTrajectory(void)
 		lJointsVel(4) = -mSKinematicChain->getMaxVel(4);
 		lJointsVel(5) =  mSKinematicChain->getMaxVel(5);
 		lJointsVel(6) =  mSKinematicChain->getMaxVel(6);
-		*/
+
 		lJointsVel(0) = -mSKinematicChain->getMaxVel(0);
 		lJointsVel(1) = -mSKinematicChain->getMaxVel(1);
 		lJointsVel(2) =  mSKinematicChain->getMaxVel(2);
@@ -821,7 +822,7 @@ void FastThrowing::_calculateThrowJointTrajectory(void)
 		(mJacobianPos*lJointsVel).Print("final");
 
 		lJoint += (lJointsVel *_dt);
-		/*
+
 		// to avoid go to near joint limits
 		for(int i=0;i<KUKA_DOF;i++){
 			mJointWeights(i) = 1.0;
@@ -840,7 +841,7 @@ void FastThrowing::_calculateThrowJointTrajectory(void)
 				cout << i << ": dn " << endl;
 			}
 		}
-		*/
+
 
 		mSKinematicChain->setJoints(lJoint.Array());
 		mThrowingJointTrj.SetRow(lJoint, 500+frame);
@@ -895,6 +896,7 @@ void FastThrowing::_calculateThrowJointTrajectory(void)
 	}
 	mThrowingJointTrj.Save("/home/seungsu/trj.txt", 10, 500+TARGET_CONT_FRAME+1000);
 }
+*/
 
 extern "C"{
     // These two "C" functions manage the creation and destruction of the class

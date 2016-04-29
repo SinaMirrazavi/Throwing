@@ -333,6 +333,7 @@ RobotInterface::Status RandomThrowing::RobotUpdate(){
 
 	switch(mStatus){
 		case STATUS_THROWJOINT_READY:
+	//		cout<<"1"<<endl;
 			mCDJointPlanner->Update();
 			mCDJointPlanner->GetState(ljoints);
 
@@ -345,7 +346,7 @@ RobotInterface::Status RandomThrowing::RobotUpdate(){
 			}
 			break;
 		case STATUS_THROWJOINT_THROWING:
-
+		//	cout<<"2"<<endl;
 			if( lThrowingIndex < 500+TARGET_CONT_FRAME+1000-1 )
 			{
 				// 400 too early
@@ -374,6 +375,7 @@ RobotInterface::Status RandomThrowing::RobotUpdate(){
 			}
 			break;
 		case STATUS_IDLE_PRETHROW:
+		//	cout<<"3"<<endl;
 			mCDJointPlanner->Update();
 			mCDJointPlanner->GetState(ljoints);
 
@@ -382,6 +384,7 @@ RobotInterface::Status RandomThrowing::RobotUpdate(){
 
 			break;
 		default:
+		//	cout<<"4"<<endl;
 			mCDJointPlanner->Update();
 			mCDJointPlanner->GetState(ljoints);
 	}
@@ -450,18 +453,17 @@ RobotInterface::Status RandomThrowing::RobotUpdateCore(){
 	if( (mStanby == STANDBY_ON) && (mStatus == STATUS_REST) && (mRecordingIndex ==0))
 	{
 		// if triger
-		if( fabs(mJointAll(0)-mJointPos(0)) > DEG2RAD(0.2) )
+	//	cout<<"fabs(mJointAll(0)-mJointPos(0))  "<<fabs(mJointAll(0)-mJointPos(0)) <<endl;
+		if( fabs(mJointAll(0)-mJointPos(0))< DEG2RAD(0.2) )
 		{
 			if (mJointAll(0) > mJointPos(0)) mIndex++;
 
 			if(mIndex<0) mIndex = 0;
 			cout << "mIndex " << mIndex << " " << fabs(mJointAll(0)-mJointPos(0)) << endl;
-			lOrder = mThrowingOrder[mIndex-1];
-
 			lPos(0) = 0.0;
 			lPos(1) = mThrowingPos(lOrder, 0) * gArmLength;
 			lPos(2) = mThrowingPos(lOrder, 1) * gArmLength;
-
+			lPos.Print("lPos");
 			lTargetPos = gShoulderPos + lPos;
 			//lTargetPos = gShoulderPos;
 
@@ -904,4 +906,3 @@ extern "C"{
     RandomThrowing* create(){return new RandomThrowing();}
     void destroy(RandomThrowing* module){delete module;}
 }
-
