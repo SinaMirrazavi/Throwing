@@ -32,6 +32,7 @@
 #include "CDDynamics.h"
 #include "ThirdPoly.h"
 #include "sKinematics.h"
+#include "std_msgs/String.h"
 
 #include "Ballistic.h"
 
@@ -150,6 +151,10 @@ protected:
 
 	void calculateThrowJointTrajectory(Vector3& targetPos);
 	void _calculateThrowJointTrajectory(void);
+    ros::Subscriber sub_pyconsole;
+    ros::Publisher pub_pyconsole;
+
+        void RespondToConsoleCommandByTopic(const std_msgs::StringConstPtr &_msg);
 public:
             FastThrowing();
     virtual ~FastThrowing();

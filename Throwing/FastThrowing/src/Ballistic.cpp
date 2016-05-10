@@ -18,7 +18,7 @@ void Ballistic::SetPosVel(double pos[], double vel[])
 
 	mGravity.Zero();
 	mGravity(2) = -9.81;
-	mAirDrag =  0.000001;
+	mAirDrag =  0.000000;
 }
 
 double Ballistic::CalSmallestError(MathLib::Vector3& TargetPos, MathLib::Vector3& Error)

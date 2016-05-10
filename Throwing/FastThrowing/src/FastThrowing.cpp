@@ -95,16 +95,6 @@ void FastThrowing::initKinematics(void){
 	// @a, d, alpha, theta0 : D-H Parameters
 	// @min, max            : joint limits
 	// @maxVel              : maximum joint speed
-	/*
-	mSKinematicChain->setDH(0,  0.0,  0.310, M_PI_2, 0.0, 1,  DEG2RAD(-120.), DEG2RAD(120.), DEG2RAD(132.0)*0.99);
-	mSKinematicChain->setDH(1,  0.0,  0.000,-M_PI_2, 0.0, 1,  DEG2RAD(-160.), DEG2RAD(160.), DEG2RAD(132.0)*0.99);
-	mSKinematicChain->setDH(2,  0.0,  0.400,-M_PI_2, 0.0, 1,  DEG2RAD(-160.), DEG2RAD(160.), DEG2RAD(128.0)*0.99);
-	mSKinematicChain->setDH(3,  0.0,  0.000, M_PI_2, 0.0, 1,  DEG2RAD(-160.), DEG2RAD(160.), DEG2RAD(128.0)*0.99);
-	mSKinematicChain->setDH(4,  0.0,  0.390, M_PI_2, 0.0, 1,  DEG2RAD(-160.), DEG2RAD(160.), DEG2RAD(204.0)*0.99);
-	mSKinematicChain->setDH(5,  0.0,  0.000,-M_PI_2, 0.0, 1,  DEG2RAD( -90.), DEG2RAD( 90.), DEG2RAD(184.0)*0.99); // reduced joint angle to save the fingers
-	mSKinematicChain->setDH(6,  0.0,  0.117,    0.0, 0.0, 1,  DEG2RAD(-170.), DEG2RAD(170.), DEG2RAD(184.0)*0.99);
-	*/
-
 	mSKinematicChain->setDH(0,   0.0,    0.310,       M_PI_2, 0.0, 1,  DEG2RAD(-160.), DEG2RAD(160.), DEG2RAD(132.0)*0.95);
 	mSKinematicChain->setDH(1,   0.0,    0.000,      -M_PI_2, 0.0, 1,  DEG2RAD(-110.), DEG2RAD(110.), DEG2RAD(132.0)*0.95);
 	mSKinematicChain->setDH(2,   0.0,    0.400,      -M_PI_2, 0.0, 1,  DEG2RAD(-160.), DEG2RAD(160.), DEG2RAD(128.0)*0.95);
@@ -237,6 +227,8 @@ RobotInterface::Status FastThrowing::RobotInit(){
 	AddConsoleCommand("cal");
 
 
+
+
     return STATUS_OK;
 }
 RobotInterface::Status FastThrowing::RobotFree(){
@@ -249,6 +241,9 @@ RobotInterface::Status FastThrowing::RobotStart(){
 	mMsgJoint.velocity.resize(4*4);
 	sub_handJoint = nodeNetwork->subscribe(JOINT_STATE_TOPIC, 3, FingerJointCallback);
 	pub_handJoint = nodeNetwork->advertise<sensor_msgs::JointState>(JOINT_CMD_TOPIC, 3);
+	 sub_pyconsole = nodeNetwork->subscribe<std_msgs::String>("/py_console_talker", 1, &FastThrowing::RespondToConsoleCommandByTopic, this);
+    pub_pyconsole = nodeNetwork->advertise<std_msgs::String>("/py_console_listener", 1);
+
 
     return STATUS_OK;
 }    
@@ -508,7 +503,7 @@ int FastThrowing::RespondToConsoleCommand(const string cmd, const vector<string>
 
 
     	lTargetPos(0) = -3.4;
-    	lTargetPos(1) = -0.957755;
+    	lTargetPos(1) = -1.200;
     	lTargetPos(2) =  0.0;
 
 
@@ -605,7 +600,11 @@ void FastThrowing::calculateThrowJointTrajectory(Vector3& targetPos)
 	mSKinematicChain->setJoints(mJointThrow.Array());
 	mSKinematicChain->getJacobianPos(mJacobianPos);
 	mSKinematicChain->getEndPos(lPos.Array());
+	mJointThrow.Print("mJointThrow");
+	lPos.Print("lPos");
 	lVel = mJacobianPos*lJointsVel;
+	lVel.Print("lVel");
+	mJacobianPos.Print("mJacobianPos");
 
 	// find yaw angle
 	Vector lcV(2);
@@ -618,10 +617,8 @@ void FastThrowing::calculateThrowJointTrajectory(Vector3& targetPos)
 	lcT.Set(targetPos.Array(), 2);
 	lcP.Set(lPos.Array(), 2);
 
-
 	lcZero(0) = 0.0; lcZero(1) = -1.0;
 	double angldefault  = acos( lcZero.Dot(lcP)/(lcZero.Norm()*lcP.Norm()));
-
 	double alpha = M_PI-acos( lcV.Dot(lcP)/(lcV.Norm()*lcP.Norm()) );
 	double beta = M_PI-( alpha+asin( lcP.Norm()/lcT.Norm()*sin(alpha)) );
 	double gamma;
@@ -632,11 +629,9 @@ void FastThrowing::calculateThrowJointTrajectory(Vector3& targetPos)
 	else
 		gamma = beta - acos( lcZero.Dot(lcT)/(lcZero.Norm()*lcT.Norm())) - angldefault;
 
+	cout<<"gamma "<<gamma<<endl;
 	mJointThrow(0) = gamma;
-
-	lVel.Print("velocity");
-	lPos.Print("position");
-	//printf("%lf \n",  RAD2DEG(gamma) );
+	printf("%lf \n",  RAD2DEG(gamma) );
 
 
 	// find magnitude
@@ -644,6 +639,11 @@ void FastThrowing::calculateThrowJointTrajectory(Vector3& targetPos)
 	mSKinematicChain->getJacobianPos(mJacobianPos);
 	mSKinematicChain->getEndPos(lPos.Array());
 	lVel = mJacobianPos*lJointsVel;
+
+	lVel.Print("lVel");
+	lPos.Print("lPos");
+
+
 
 	double lDuration;
 	double lKp = 1.0;
@@ -670,6 +670,7 @@ cout<<"mOffsetMag "<<mOffsetMag<<endl;
 	lJointsVel *= lKp;
 	lVel = mJacobianPos*lJointsVel;
 	mJointThrow(0) += mOffsetYaw;
+	cout<<"mOffsetYaw "<<mOffsetYaw<<endl;
 
 	printf("yaw : %lf, mag : %lf \n", RAD2DEG(gamma), lKp);
 
@@ -903,4 +904,43 @@ extern "C"{
     FastThrowing* create(){return new FastThrowing();}
     void destroy(FastThrowing* module){delete module;}
 }
+
+
+std::vector<string> split(const string &s, char delim) {
+    stringstream ss(s);
+    string item;
+    vector<string> tokens;
+    while (getline(ss, item, delim)) {
+        tokens.push_back(item);
+    }
+    return tokens;
+}
+
+void FastThrowing::RespondToConsoleCommandByTopic(const std_msgs::StringConstPtr& _msg){
+
+    std_msgs::String my_message;
+
+    // Cut the message into pieces
+    std::vector<std::string> x = split(_msg->data, ' ');
+    cout<<"1 "<<endl;
+
+    if (x.size()){
+        // get first element and remove it
+        string cmd = x.at(0);
+        x.erase(x.begin());
+        cout<<"2 "<<endl;
+        // get the rest as arguments
+        vector<string> args = x;
+        cout<<"3 "<<endl;
+        RespondToConsoleCommand(cmd, args);
+        cout<<"4 "<<endl;
+     //   my_message.data = GetConsole()->GetLines().back();
+        cout<<"5 "<<endl;
+    }else{
+
+        GetConsole()->Print(""); // Just print something empty to flush the previous response
+    }
+    pub_pyconsole.publish(my_message);
+}
+
 
