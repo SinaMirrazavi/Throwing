@@ -33,7 +33,7 @@ for(int i=0; i<50; i++){
 6. CDdymic is used to move the robot to the ready position.
 7. Third order polynomial motion is used to move the robot from the ready position to the throwing position with the desired velocity. 
 
-#### How to rand the code:
+#### How to run the code:
 In short:
 
 1. job
